@@ -6,15 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Fixed
-
-- `timeout` now always surfaces the builtin `TimeoutError`. On Python 3.10,
-  `asyncio.wait_for` raises the distinct `asyncio.TimeoutError` (the two types
-  were unified in 3.11), which meant `except TimeoutError` and
-  `retry_on=TimeoutError` silently missed timeouts there. Behavior is now
-  consistent across Python 3.10–3.14.
-
-## [0.1.0] - 2026-06-01
+## [0.1.0] - 2026-06-02
 
 ### Added
 
@@ -30,6 +22,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `Progress` snapshots via an `on_progress` callback.
 - `return_exceptions` to collect failures instead of raising.
 - Fully typed, `py.typed`, zero runtime dependencies, Python 3.10–3.14.
+
+### Fixed
+
+- `timeout` always surfaces the builtin `TimeoutError`. On Python 3.10,
+  `asyncio.wait_for` raises the distinct `asyncio.TimeoutError` (the two types
+  were unified in 3.11), so `except TimeoutError` and `retry_on=TimeoutError`
+  now behave consistently across Python 3.10–3.14.
 
 [Unreleased]: https://github.com/jpwm2/tasklane/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/jpwm2/tasklane/releases/tag/v0.1.0
