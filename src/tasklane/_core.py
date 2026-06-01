@@ -129,6 +129,21 @@ def _should_retry(exc: BaseException, retry_on: RetryOn) -> bool:
     return bool(retry_on(exc))
 
 
+def _normalize_timeout(exc: BaseException) -> BaseException:
+    """Surface asyncio timeouts as the builtin ``TimeoutError`` on every version.
+
+    On Python 3.10, ``asyncio.wait_for`` raises ``asyncio.TimeoutError``, which is
+    a distinct type from the builtin ``TimeoutError`` (the two were unified in
+    3.11). Re-mapping it means ``except TimeoutError`` and ``retry_on=TimeoutError``
+    behave identically across the supported 3.10-3.14 range.
+    """
+    if isinstance(exc, asyncio.TimeoutError) and not isinstance(exc, TimeoutError):
+        normalized = TimeoutError(str(exc))
+        normalized.__cause__ = exc.__cause__
+        return normalized
+    return exc
+
+
 async def _run_one(item: T, s: _Settings[T, R]) -> tuple[Any, BaseException | None]:
     """Run ``func(item)`` with retries, backoff, timeout, and rate limiting."""
     attempt = 0
@@ -142,8 +157,9 @@ async def _run_one(item: T, s: _Settings[T, R]) -> tuple[Any, BaseException | No
         except asyncio.CancelledError:
             raise
         except BaseException as exc:
-            if attempt >= s.retries or not _should_retry(exc, s.retry_on):
-                return None, exc
+            error = _normalize_timeout(exc)
+            if attempt >= s.retries or not _should_retry(error, s.retry_on):
+                return None, error
             delay = s.backoff.delay_for(attempt)
             attempt += 1
             if delay > 0:

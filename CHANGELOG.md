@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `timeout` now always surfaces the builtin `TimeoutError`. On Python 3.10,
+  `asyncio.wait_for` raises the distinct `asyncio.TimeoutError` (the two types
+  were unified in 3.11), which meant `except TimeoutError` and
+  `retry_on=TimeoutError` silently missed timeouts there. Behavior is now
+  consistent across Python 3.10–3.14.
+
 ## [0.1.0] - 2026-06-01
 
 ### Added
