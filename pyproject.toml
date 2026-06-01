@@ -49,7 +49,7 @@ Changelog = "https://github.com/jpwm2/tasklane/blob/main/CHANGELOG.md"
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
-    "coverage[toml]>=7.0",
+    "coverage[toml]>=7.14.1",
     "mypy>=1.11",
     "ruff>=0.6",
 ]
